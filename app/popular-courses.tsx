@@ -214,9 +214,9 @@ export default function CoursesPage({ userId }: { userId?: string }) {
               <Card className="overflow-hidden h-[24rem]">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <Badge className="absolute top-4 left-4 z-10">
+                    {/* <Badge className="absolute top-4 left-4 z-10">
                       {course?.platform?.toUpperCase()}
-                    </Badge>
+                    </Badge> */}
                     <Image
                       src={course?.thumbnail || "/placeholder.svg"}
                       alt={course?.title}
