@@ -13,8 +13,8 @@ export async function GET(request: Request) {
 
   try {
     const [youtubeResponse, udemyResponse] = await Promise.all([
-      fetch(`http://localhost:3000/api/youtube?query=${query}`),
-      fetch(`http://localhost:3000/api/udemy?query=${query}`),
+      fetch(`https://deka-learn.vercel.app/api/youtube?query=${query}`),
+      fetch(`https://deka-learn.vercel.app/api/udemy?query=${query}`),
     ]);
 
     const youtube = await youtubeResponse.json();

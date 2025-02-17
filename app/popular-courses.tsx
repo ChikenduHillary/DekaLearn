@@ -160,6 +160,12 @@ export default function CoursesPage({ userId }: { userId?: string }) {
   const handleSearch = () => {
     if (!searchTerm) return;
     fetchCourses(searchTerm.trim());
+
+     // Scroll to the courses section after searching
+  const coursesSection = document.getElementById("courses-section");
+  if (coursesSection) {
+    coursesSection.scrollIntoView({ behavior: "smooth" });
+  }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -171,7 +177,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
   const fetchCourses = async (query: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/courses?query=${query}`);
+      const response = await fetch(`https://deka-learn.vercel.app/api/courses?query=${query}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -271,7 +277,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
   return (
     <main>
       {/* Hero Section */}
-      <section className="bg-[#6366F1] min-h-screen">
+      <section className="bg-[#6366F1] max-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Navigation */}
           <nav className="flex items-center justify-between py-6">
@@ -337,7 +343,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
       </section>
 
       {/* Course Sections */}
-      <section className="py-20">
+      <section className="py-20" id="courses-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Recently Viewed Courses */}
           {userId &&
