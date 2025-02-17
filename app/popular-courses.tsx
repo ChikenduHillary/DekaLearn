@@ -17,6 +17,8 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 
+const BASE_URL = "https://dekalearn-backend-1.onrender.com";
+
 interface Course {
   id: string;
   title: string;
@@ -77,8 +79,8 @@ const EmptyState = () => (
     </div>
     <h3 className="text-2xl font-semibold mb-2">No courses found</h3>
     <p className="text-gray-500 max-w-md mb-4">
-      Try searching for your favorite topics like web development, machine
-      learning, or digital marketing
+      Try searching for your favorite topics like web development, machine learning,
+      or digital marketing
     </p>
     <div className="flex items-center text-sm text-gray-400">
       <Search className="w-4 h-4 mr-2" />
@@ -94,7 +96,6 @@ export default function CoursesPage({ userId }: { userId?: string }) {
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
 
-  // Load course history when component mounts
   useEffect(() => {
     if (userId) {
       loadCourseHistory();
@@ -106,7 +107,12 @@ export default function CoursesPage({ userId }: { userId?: string }) {
 
     setHistoryLoading(true);
     try {
-      const response = await fetch(`/api/history?userId=${userId}&limit=4`);
+      const response = await fetch(
+        `${BASE_URL}/api/course-history?userId=${userId}&limit=4`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data: HistoryResponse = await response.json();
 
       if (data.history) {
@@ -123,7 +129,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
     if (!userId) return;
 
     try {
-      await fetch("/api/history", {
+      const response = await fetch(`${BASE_URL}/api/course-history`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,6 +146,13 @@ export default function CoursesPage({ userId }: { userId?: string }) {
           thumbnail: course.thumbnail,
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Refresh history after adding new course
+      await loadCourseHistory();
     } catch (error) {
       console.error("Error saving course history:", error);
     }
@@ -160,6 +173,9 @@ export default function CoursesPage({ userId }: { userId?: string }) {
     setLoading(true);
     try {
       const response = await fetch(`/api/courses?query=${query}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
 
       const combinedCourses = [
@@ -195,7 +211,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
               onClick={() => handleCourseClick(course)}
               target="blank"
             >
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden h-[24rem]">
                 <CardContent className="p-0">
                   <div className="relative">
                     <Badge className="absolute top-4 left-4 z-10">
@@ -210,9 +226,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
                     />
                   </div>
                   <div className="p-6 space-y-4">
-                    <h3 className="font-medium line-clamp-2">
-                      {course?.title}
-                    </h3>
+                    <h3 className="font-medium line-clamp-2">{course?.title}</h3>
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -263,7 +277,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
           {/* Navigation */}
           <nav className="flex items-center justify-between py-6">
             <div className="flex items-center space-x-8">
-              <h1 className="text-white text-2xl font-bold">eDex</h1>
+              <h1 className="text-white text-2xl font-bold">DekaLearn</h1>
             </div>
             <div className="flex items-center space-x-4">
               <SignedOut>
@@ -297,9 +311,8 @@ export default function CoursesPage({ userId }: { userId?: string }) {
                 Discover World-Class Online Courses from Leading Experts
               </h2>
               <p className="text-white/80">
-                Explore courses from top universities and industry leaders.
-                Learn at your own pace and earn certificates to showcase your
-                skills.
+                Explore courses from top universities and industry leaders. Learn at
+                your own pace and earn certificates to showcase your skills.
               </p>
               <div className="relative">
                 <Input
@@ -334,7 +347,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
             renderCourseGrid(recentCourses, "Recently Viewed Courses")}
 
           {/* Search Results */}
-          {loading ? (
+          {loading || historyLoading ? (
             <LoadingSkeleton />
           ) : courses.length > 0 ? (
             renderCourseGrid(
@@ -352,7 +365,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-[#6366F1]">eDex</h3>
+              <h3 className="text-xl font-bold text-[#6366F1]">DekaLearn</h3>
               <p className="text-gray-600">
                 Empowering learners worldwide with quality education and skill
                 development opportunities.
@@ -435,7 +448,7 @@ export default function CoursesPage({ userId }: { userId?: string }) {
             </div>
           </div>
           <div className="border-t mt-12 pt-8 text-center text-gray-600">
-            <p>&copy; 2025 eDex. All rights reserved.</p>
+            <p>&copy; 2025 DekaLearn. All rights reserved.</p>
           </div>
         </div>
       </footer>
